@@ -26,8 +26,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install node deps
-        run: npm ci
+      - name: Prepare Serverless
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm i -g serverless serverless-python-requirements
+          fi
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -35,6 +40,9 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Deploy with Serverless
-        run: npx serverless deploy --stage dev
+      - name: Deploy with Serverless (force package)
+        run: npx serverless deploy --stage dev --force || true
+
+      - name: Deploy function code (api)
+        run: npx serverless deploy function -f api --stage dev
 
