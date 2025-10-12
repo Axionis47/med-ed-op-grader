@@ -1,0 +1,101 @@
+service: med-ed-op-grader
+frameworkVersion: '3'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    fileName: api/requirements.txt
+    dockerizePip: true
+    dockerImage: public.ecr.aws/sam/build-python3.11:latest
+    useStaticCache: true
+    useDownloadCache: true
+    slim: true
+    pythonBin: python3
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  architecture: x86_64
+  environment:
+    SUBMISSIONS_TABLE: !Ref SubmissionsTable
+    S3_BUCKET_TRANSCRIPTS: !Ref TranscriptsBucket
+    STAGE: ${opt:stage, 'dev'}
+    TRANSCRIBE_MEDICAL: 'true'
+    TRANSCRIBE_LANGUAGE: 'en-US'
+    OPENSEARCH_COLLECTION: oprg-${opt:stage, 'dev'}
+    OPENSEARCH_INDEX: docs-${opt:stage, 'dev'}
+    BEDROCK_MODEL_EXTRACTOR: anthropic.claude-3-5-sonnet-20240620-v1:0
+    BEDROCK_EMBED_MODEL: amazon.titan-embed-text-v2:0
+    PROMPT_BUNDLE_ID: bundle_2025_10_op@1.0.0
+    GUARDRAILS_ID: opgrader-guardrails
+    TOP_K: '6'
+    CHUNK_SIZE_CHARS: '500'
+    CHUNK_OVERLAP_CHARS: '100'
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:ListBucket
+          Resource:
+            - Fn::Sub: 'arn:aws:s3:::${TranscriptsBucket}'
+            - Fn::Sub: 'arn:aws:s3:::${TranscriptsBucket}/*'
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource: !GetAtt SubmissionsTable.Arn
+        - Effect: Allow
+          Action:
+            - transcribe:StartMedicalTranscriptionJob
+            - transcribe:GetMedicalTranscriptionJob
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+            - bedrock:InvokeModelWithResponseStream
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - aoss:APIAccessAll
+          Resource: '*'
+
+functions:
+  api:
+    handler: api/lambda_handler.lambda_handler
+    events:
+      - httpApi: '*'
+
+resources:
+  Resources:
+    TranscriptsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+    SubmissionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: submission_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: submission_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+

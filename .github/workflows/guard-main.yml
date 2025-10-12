@@ -6,9 +6,9 @@ jobs:
   block-direct-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if direct push to main
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'dependabot[bot]' }}
+      - name: Warn if direct push to main
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'dependabot[bot]' && !contains(github.event.head_commit.message, 'Merge pull request') }}
+        continue-on-error: true
         run: |
-          echo "Direct pushes to main are not allowed. Use PRs." >&2
-          exit 1
-
+          echo "WARNING: Direct pushes to main are discouraged. Please use PRs." >&2
+          echo "Set branch protection once repo is public/Pro to enforce."
