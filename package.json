@@ -1,0 +1,13 @@
+{
+  "name": "med-ed-op-grader",
+  "private": true,
+  "devDependencies": {
+    "serverless": "^3.39.0",
+    "serverless-python-requirements": "^6.1.1"
+  },
+  "scripts": {
+    "infra:deploy": "serverless deploy --config infra/serverless.yml",
+    "infra:info": "serverless info --config infra/serverless.yml"
+  }
+}
+
