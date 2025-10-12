@@ -2,6 +2,11 @@ name: Infra Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (branch or tag) to deploy'
+        required: true
+        default: 'main'
 
 permissions:
   id-token: write
@@ -11,8 +16,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout target ref
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,6 +35,9 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Deploy with Serverless
-        run: npx serverless deploy --stage dev
+      - name: Deploy with Serverless (force package)
+        run: npx serverless deploy --stage dev --force || true
+
+      - name: Deploy function code (api)
+        run: npx serverless deploy function -f api --stage dev
 

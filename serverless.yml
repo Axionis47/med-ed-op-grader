@@ -7,7 +7,10 @@ plugins:
 custom:
   pythonRequirements:
     fileName: api/requirements.txt
-    dockerizePip: false
+    dockerizePip: true
+    dockerImage: public.ecr.aws/sam/build-python3.11:latest
+    useStaticCache: true
+    useDownloadCache: true
     slim: true
     pythonBin: python3
 
@@ -16,11 +19,13 @@ provider:
   runtime: python3.11
   region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'dev'}
+  architecture: x86_64
   environment:
     SUBMISSIONS_TABLE: !Ref SubmissionsTable
     S3_BUCKET_TRANSCRIPTS: !Ref TranscriptsBucket
     TRANSCRIBE_MEDICAL: 'true'
     TRANSCRIBE_LANGUAGE: 'en-US'
+    PKG_BUMP: '1'
   iam:
     role:
       statements:
