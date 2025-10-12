@@ -31,7 +31,7 @@ jobs:
           if [ -f package-lock.json ]; then
             npm ci
           else
-            npm i -g serverless serverless-python-requirements
+            npm i -g serverless@3 serverless-python-requirements
           fi
 
       - name: Configure AWS credentials (OIDC)
