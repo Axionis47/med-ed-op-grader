@@ -6,6 +6,11 @@ from datetime import datetime, timezone
 
 import boto3
 
+# Phase 3 utilities (Bedrock + retrieval fallback)
+from .bedrock_client import converse_json
+from .retriever import build_context
+
+
 # Simple utilities for Phase 3 scaffolds (no external calls yet)
 
 TIME_RE = re.compile(r"(?i)\b\d{1,2}:\d{2}\b|last\s+known\s+well|sudden(?:ly)?|onset|this\s+morning|yesterday|timeline")
@@ -22,6 +27,16 @@ STROKE_PERT_RE = {
     "facial droop": re.compile(r"(?i)facial\s+droop"),
 }
 
+PROMPTS_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "prompts", "bundles", os.getenv("PROMPT_BUNDLE_ID", "bundle_2025_10_op@1.0.0")))
+
+
+def _load_system(name: str) -> str:
+    try:
+        with open(os.path.join(PROMPTS_ROOT, f"{name}.system.txt"), "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return "Return ONLY valid JSON per schema with evidence line ranges."
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -36,13 +51,33 @@ def load_sanitized_text(s3, bucket: str, key: str) -> List[str]:
 
 def find_hpi_bounds(lines: List[str]) -> Tuple[int, int, List[List[int]]]:
     """Return (start_line, end_line, evidence_spans). 1-based inclusive lines.
-    Heuristic: from first HPI marker to next ROS marker. If none, whole doc.
+    First try LLM sectioner; fallback to heuristic from HPI -> ROS.
     """
+    try:
+        system = _load_system("sectioner")
+        ctx = build_context(lines)
+        payload = {"text": "\n".join(lines), "lines_total": len(lines), "context": ctx}
+        out = converse_json("sectioner", system, payload)
+        if out and out.get("sections"):
+            sel = None
+            for sec in out["sections"]:
+                name = (sec.get("name") or "").lower()
+                if "hpi" in name or "present illness" in name:
+                    sel = sec
+                    break
+            if not sel:
+                sel = out["sections"][0]
+            s = max(1, int(sel.get("start_line", 1)))
+            e = max(s, int(sel.get("end_line", s)))
+            ev = sel.get("evidence") or [[s, min(s + 1, e)]]
+            return s, e, ev
+    except Exception:
+        pass
+    # Fallback heuristic
     n = len(lines)
     start = 1
     end = n
     ev: List[List[int]] = []
-
     for i, ln in enumerate(lines, start=1):
         if HPI_MARK_RE.search(ln):
             start = i
@@ -57,6 +92,17 @@ def find_hpi_bounds(lines: List[str]) -> Tuple[int, int, List[List[int]]]:
 
 def find_time_events(lines: List[str], bounds: Tuple[int, int]) -> Dict:
     s, e = bounds
+    # Try LLM timeline constrained to HPI window
+    try:
+        system = _load_system("timeline")
+        hpi_text = "\n".join(lines[s - 1 : e])
+        payload = {"hpi_text": hpi_text, "bounds": [s, e]}
+        out = converse_json("timeline", system, payload)
+        if out and isinstance(out.get("events"), list):
+            return {"events": out.get("events", []), "conflicts": out.get("conflicts", [])}
+    except Exception:
+        pass
+    # Fallback heuristic
     events = []
     conflicts: List[Dict] = []
     for i in range(s, e + 1):
@@ -70,13 +116,22 @@ def find_time_events(lines: List[str], bounds: Tuple[int, int]) -> Dict:
                 "placement": "hpi",
                 "evidence": [[i, i]],
             })
-            # For scaffolding: stop at first match
             break
     return {"events": events, "conflicts": conflicts}
 
 
 def extract_pertinents(lines: List[str], bounds: Tuple[int, int], cc_pack: str) -> Dict:
     s, e = bounds
+    # Try LLM extractor with placement awareness
+    try:
+        system = _load_system("pertinents")
+        payload = {"text": "\n".join(lines), "bounds": [s, e], "cc_pack": cc_pack}
+        out = converse_json("pertinents", system, payload)
+        if out and isinstance(out.get("items"), list) and out["items"]:
+            return {"items": out["items"]}
+    except Exception:
+        pass
+    # Fallback regex-based extractor
     items = []
     for name, rx in STROKE_PERT_RE.items():
         found_line = None
@@ -99,11 +154,21 @@ def extract_pertinents(lines: List[str], bounds: Tuple[int, int], cc_pack: str) 
 
 def simple_summary(lines: List[str], bounds: Tuple[int, int]) -> Dict:
     s, e = bounds
+    # Try LLM summary constrained to HPI bounds
+    try:
+        system = _load_system("summary")
+        hpi_text = "\n".join(lines[s - 1 : e])
+        payload = {"hpi_text": hpi_text, "bounds": [s, e]}
+        out = converse_json("summary", system, payload)
+        if out and isinstance(out.get("evidence"), list):
+            return out
+    except Exception:
+        pass
+    # Fallback heuristic
     hpi_lines = [ln for i, ln in enumerate(lines, start=1) if s <= i <= e and ln.strip()]
     has_two = len(hpi_lines) >= 2
     ev = []
     if hpi_lines:
-        # evidence on the first non-empty line range (single line)
         first_line_idx = next(i for i, ln in enumerate(lines, start=1) if s <= i <= e and ln.strip())
         ev = [[first_line_idx, first_line_idx]]
     history_sentence = hpi_lines[0] if hpi_lines else None
@@ -118,6 +183,17 @@ def simple_summary(lines: List[str], bounds: Tuple[int, int]) -> Dict:
 
 def simple_ddx(lines: List[str], bounds: Tuple[int, int]) -> List[Dict]:
     s, e = bounds
+    # Try LLM DDx within HPI window
+    try:
+        system = _load_system("ddx")
+        hpi_text = "\n".join(lines[s - 1 : e])
+        payload = {"hpi_text": hpi_text, "bounds": [s, e]}
+        out = converse_json("ddx", system, payload)
+        if out and isinstance(out.get("items"), list) and out["items"]:
+            return out["items"]
+    except Exception:
+        pass
+    # Fallback scaffolded DDx
     ev = [[s, s]]
     return [
         {"dx": "ischemic stroke", "why_for": ["focal deficits"], "why_against": [], "priority": 1, "evidence": ev},

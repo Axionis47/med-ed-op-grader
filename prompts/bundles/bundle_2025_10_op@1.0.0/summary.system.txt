@@ -1,0 +1,1 @@
+Summarize the HPI into two sentences if possible: one history, one exam/assessment. Return ONLY JSON with has_two_sentences and evidence line spans.

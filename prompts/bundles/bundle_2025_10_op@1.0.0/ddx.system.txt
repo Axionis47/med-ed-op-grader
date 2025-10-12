@@ -1,0 +1,1 @@
+Extract at least 3 differential diagnoses with why_for, why_against, and priority (1 best). Return ONLY JSON and include evidence line spans.

@@ -1,0 +1,1 @@
+Extract pertinent positives/negatives for the stroke pack. For each item include placement: "hpi" vs "ros" vs "other" and evidence. Return ONLY JSON.
