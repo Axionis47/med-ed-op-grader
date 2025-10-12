@@ -9,6 +9,11 @@ from .gatekeeper import is_sufficient
 
 app = FastAPI()
 
+# Health endpoint for smoke checks
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 TRANSCRIPTS_BUCKET = os.environ.get("S3_BUCKET_TRANSCRIPTS")
 
 class SanitizeIn(BaseModel):
