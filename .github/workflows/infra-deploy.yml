@@ -26,8 +26,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install node deps
-        run: npm ci
+      - name: Install Serverless CLI and plugin
+        run: npm i -g serverless serverless-python-requirements
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
