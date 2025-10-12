@@ -7,7 +7,7 @@ export default defineConfig({
     trace: 'off',
   },
   webServer: {
-    command: 'npm run build && npm run preview -- --port=5173',
+    command: 'npm run build && npm run preview -- --port=5173 --strictPort',
     port: 5173,
     reuseExistingServer: true,
     timeout: 120000,
