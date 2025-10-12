@@ -1,0 +1,14 @@
+name: Guard Main
+on:
+  push:
+    branches: [ main ]
+jobs:
+  block-direct-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if direct push to main
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'dependabot[bot]' }}
+        run: |
+          echo "Direct pushes to main are not allowed. Use PRs." >&2
+          exit 1
+
