@@ -368,3 +368,21 @@ def analyze_orchestrate(submission_id: str):
         add_history={"at": _now_iso(), "status": "ANALYZED", "note": analysis_key},
     )
     return {"analysis_key": analysis_key, **analysis}
+
+
+# -------------------- Phase 4 scoring endpoints --------------------
+from .score_endpoint import score_submission as _score_submission, get_score as _get_score
+
+@app.post("/score/{submission_id}")
+def post_score(submission_id: str):
+    try:
+        return _score_submission(submission_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/score/{submission_id}")
+def get_score_route(submission_id: str):
+    try:
+        return _get_score(submission_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
