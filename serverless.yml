@@ -40,10 +40,12 @@ provider:
           Action:
             - dynamodb:PutItem
             - dynamodb:GetItem
+            - dynamodb:UpdateItem
           Resource: !GetAtt SubmissionsTable.Arn
         - Effect: Allow
           Action:
             - transcribe:StartMedicalTranscriptionJob
+            - transcribe:GetMedicalTranscriptionJob
           Resource: '*'
         - Effect: Allow
           Action:
