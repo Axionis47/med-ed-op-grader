@@ -1,0 +1,6 @@
+*       @your-org/platform @your-handle
+/api/   @your-org/backend
+/infra/ @your-org/devops
+/ui-*/  @your-org/frontend
+/prompts/ @your-org/nlp
+
