@@ -15,7 +15,7 @@ from .sanitize import (
     confidence_summary_from_transcribe,
 )
 from .gatekeeper import is_sufficient
-from .models import get_submission, update_submission, put_submission
+from .models import get_submission, update_submission
 
 app = FastAPI()
 logger = logging.getLogger("app")
@@ -105,11 +105,6 @@ def create_or_get_submission(body: SubmissionIn):
             Media={"MediaFileUri": media_uri},
             OutputBucketName=TRANSCRIPTS_BUCKET,
         )
-        item.update({
-            "status": "TRANSCRIBING",
-            "audio_key": body.audio_key,
-            "transcribe_job_name": job_name,
-        })
         logger.info({
             "evt": "submission_status_change",
             "submission_id": sub_id,
@@ -118,18 +113,22 @@ def create_or_get_submission(body: SubmissionIn):
             "keys": {"audio": body.audio_key},
             "job": job_name,
         })
-        put_submission(item)
         update_submission(
             sub_id,
+            status="TRANSCRIBING",
+            test_id=test_id,
+            audio_key=body.audio_key,
+            transcribe_job_name=job_name,
             add_history={"at": _now_iso(), "status": "TRANSCRIBING", "note": f"job_name={job_name}"},
         )
         return {"submission_id": sub_id, "status": "TRANSCRIBING"}
 
     if body.transcript_key:
-        item.update({"status": "READY_FOR_SANITIZE", "transcript_key": body.transcript_key})
-        put_submission(item)
         update_submission(
             sub_id,
+            status="READY_FOR_SANITIZE",
+            test_id=test_id,
+            transcript_key=body.transcript_key,
             add_history={"at": _now_iso(), "status": "READY_FOR_SANITIZE", "note": f"raw={body.transcript_key}"},
         )
         return {"submission_id": sub_id, "status": "READY_FOR_SANITIZE"}
