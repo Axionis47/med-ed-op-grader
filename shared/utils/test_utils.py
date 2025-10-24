@@ -21,7 +21,8 @@ class TestLCS:
         seq1 = ['A', 'B', 'C', 'D']
         seq2 = ['A', 'C', 'D']
         assert longest_common_subsequence(seq1, seq2) == 3
-        assert lcs_score(seq1, seq2) == 0.75
+        # lcs_score divides by len(expected) which is seq2 (3), so 3/3 = 1.0
+        assert lcs_score(seq1, seq2) == 1.0
     
     def test_no_match(self):
         """Test LCS with no match."""
@@ -35,7 +36,8 @@ class TestLCS:
         expected = ['CC', 'HPI', 'ROS', 'PMH', 'SH', 'FH', 'Summary']
         detected = ['CC', 'HPI', 'PMH', 'ROS', 'SH']
         lcs_length = longest_common_subsequence(detected, expected)
-        assert lcs_length == 5  # CC, HPI, PMH, SH (ROS out of order)
+        # LCS is ['CC', 'HPI', 'ROS', 'SH'] = 4 (PMH is out of order)
+        assert lcs_length == 4
     
     def test_get_lcs_elements(self):
         """Test getting actual LCS elements."""

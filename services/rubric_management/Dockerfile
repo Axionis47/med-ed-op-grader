@@ -3,14 +3,14 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy requirements and install dependencies
-COPY requirements.txt .
+COPY services/rubric_management/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy shared modules
-COPY ../../shared /app/shared
+COPY shared /app/shared
 
 # Copy service code
-COPY ./app /app/services/rubric_management/app
+COPY services/rubric_management/app /app/services/rubric_management/app
 
 # Create data directory
 RUN mkdir -p /app/data/rubrics

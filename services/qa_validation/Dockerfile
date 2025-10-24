@@ -2,18 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy shared dependencies
-COPY shared/ /app/shared/
-
-# Copy service files
+# Copy requirements and install dependencies
 COPY services/qa_validation/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY services/qa_validation/app/ /app/services/qa_validation/app/
+# Copy shared modules
+COPY shared /app/shared
 
-# Expose port
-EXPOSE 8010
+# Copy service code
+COPY services/qa_validation/app /app/services/qa_validation/app
+
+# Expose port (will be set per service)
+EXPOSE 8000
 
 # Run the service
-CMD ["python", "-m", "uvicorn", "services.qa_validation.app.main:app", "--host", "0.0.0.0", "--port", "8010"]
+CMD ["python", "-m", "uvicorn", "services.qa_validation.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 

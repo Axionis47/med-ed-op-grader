@@ -2,16 +2,17 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy shared dependencies
-COPY shared/ /app/shared/
-
-# Copy service files
+# Copy requirements and install dependencies
 COPY services/grading_orchestrator/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY services/grading_orchestrator/app/ /app/services/grading_orchestrator/app/
+# Copy shared modules
+COPY shared /app/shared
 
-# Expose port
+# Copy service code
+COPY services/grading_orchestrator/app /app/services/grading_orchestrator/app
+
+# Expose port (will be set per service)
 EXPOSE 8000
 
 # Run the service
