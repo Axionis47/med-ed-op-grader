@@ -1,0 +1,28 @@
+[00:05] Student: Good morning, I'm Dr. Johnson. What brings you to the emergency department today?
+[00:08] Patient: I've been having chest pain.
+[00:12] Student: I'm sorry to hear that. Can you describe the pain for me? What does it feel like?
+[00:16] Patient: It's a heavy, squeezing sensation in the center of my chest.
+[00:22] Student: When did the pain start?
+[00:25] Patient: About an hour ago, while I was mowing the lawn.
+[00:30] Student: Does the pain go anywhere else? Does it radiate?
+[00:34] Patient: Yes, it goes down my left arm and up to my jaw.
+[00:40] Student: On a scale of 1 to 10, with 10 being the worst pain you've ever felt, how would you rate this pain?
+[00:45] Patient: I'd say it's about an 8 out of 10.
+[00:50] Student: Does anything make the pain better or worse?
+[00:54] Patient: Resting seems to help a little, but it hasn't gone away completely.
+[01:00] Student: Have you had any other symptoms? Shortness of breath, nausea, sweating?
+[01:05] Patient: Yes, I've been sweating a lot and feel a bit nauseous.
+[01:10] Student: Have you ever had chest pain like this before?
+[01:13] Patient: No, never like this.
+[01:18] Student: Do you have any past medical history? Any chronic conditions?
+[01:22] Patient: I have high cholesterol and high blood pressure.
+[01:27] Student: Are you taking any medications?
+[01:30] Patient: Yes, I take atorvastatin and amlodipine.
+[01:35] Student: Do you smoke?
+[01:37] Patient: Yes, I smoke about a pack a day. I've been smoking for 30 years.
+[01:43] Student: Do you drink alcohol?
+[01:45] Patient: Occasionally, maybe a beer or two on weekends.
+[01:50] Student: Does anyone in your family have a history of heart disease?
+[01:54] Patient: Yes, my father had a heart attack at age 55.
+[02:00] Student: So to summarize, this is a 58-year-old male with a history of hypertension and hyperlipidemia presenting with acute onset substernal chest pain that is crushing in quality, radiating to the left arm and jaw, associated with diaphoresis and nausea. He has significant risk factors including smoking and family history of early coronary artery disease. This presentation is highly concerning for acute coronary syndrome and requires immediate evaluation with EKG and cardiac biomarkers.
+

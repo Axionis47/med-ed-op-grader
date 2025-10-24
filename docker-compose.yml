@@ -1,0 +1,218 @@
+version: '3.8'
+
+services:
+  # Grading Orchestrator Service (Main Entry Point)
+  grading-orchestrator:
+    build:
+      context: .
+      dockerfile: services/grading_orchestrator/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RUBRIC_SERVICE_URL=http://rubric-management:8001
+      - TRANSCRIPT_SERVICE_URL=http://transcript-processing:8002
+      - QUESTION_SERVICE_URL=http://question-matching:8003
+      - STRUCTURE_SERVICE_URL=http://structure-evaluator:8004
+      - REASONING_SERVICE_URL=http://reasoning-evaluator:8005
+      - SUMMARY_SERVICE_URL=http://summary-evaluator:8006
+      - SCORING_SERVICE_URL=http://scoring:8007
+      - FEEDBACK_SERVICE_URL=http://feedback-composer:8008
+    networks:
+      - grading-network
+    depends_on:
+      - rubric-management
+      - transcript-processing
+      - question-matching
+      - structure-evaluator
+      - reasoning-evaluator
+      - summary-evaluator
+      - scoring
+      - feedback-composer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Rubric Management Service
+  rubric-management:
+    build:
+      context: .
+      dockerfile: services/rubric_management/Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data/rubrics:/app/data/rubrics
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Structure Evaluator Service
+  structure-evaluator:
+    build:
+      context: .
+      dockerfile: services/structure_evaluator/Dockerfile
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Scoring Service
+  scoring:
+    build:
+      context: .
+      dockerfile: services/scoring/Dockerfile
+    ports:
+      - "8007:8007"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Feedback Composer Service
+  feedback-composer:
+    build:
+      context: .
+      dockerfile: services/feedback_composer/Dockerfile
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Transcript Processing Service
+  transcript-processing:
+    build:
+      context: .
+      dockerfile: services/transcript_processing/Dockerfile
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Question Matching Service
+  question-matching:
+    build:
+      context: .
+      dockerfile: services/question_matching/Dockerfile
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Reasoning Evaluator Service
+  reasoning-evaluator:
+    build:
+      context: .
+      dockerfile: services/reasoning_evaluator/Dockerfile
+    ports:
+      - "8005:8005"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Summary Evaluator Service
+  summary-evaluator:
+    build:
+      context: .
+      dockerfile: services/summary_evaluator/Dockerfile
+    ports:
+      - "8006:8006"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # QA Validation Service
+  qa-validation:
+    build:
+      context: .
+      dockerfile: services/qa_validation/Dockerfile
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./shared:/app/shared
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - grading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  grading-network:
+    driver: bridge
+
+volumes:
+  rubric-data:
+

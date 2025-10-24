@@ -1,0 +1,196 @@
+{
+  "rubric_id": "stroke_v1",
+  "version": "1.0.0",
+  "status": "approved",
+  "created_at": "2025-10-24T10:00:00Z",
+  "updated_at": "2025-10-24T10:00:00Z",
+  "weights": {
+    "structure": 0.2,
+    "key_questions": 0.4,
+    "reasoning": 0.25,
+    "summary": 0.15,
+    "communication": 0.0
+  },
+  "structure": {
+    "anchor": "#R.structure",
+    "expected_order": ["CC", "HPI", "ROS", "PMH", "SH", "FH", "Summary"],
+    "penalties": [
+      {
+        "id": "swap_ros_before_hpi",
+        "anchor": "#R.structure.penalty.swap_ros_before_hpi",
+        "description": "ROS appears before HPI",
+        "value": -0.2
+      },
+      {
+        "id": "missing_summary",
+        "anchor": "#R.structure.penalty.missing_summary",
+        "description": "Missing summary section",
+        "value": -0.3
+      },
+      {
+        "id": "missing_hpi",
+        "anchor": "#R.structure.penalty.missing_hpi",
+        "description": "Missing HPI section",
+        "value": -0.4
+      }
+    ]
+  },
+  "key_questions": [
+    {
+      "id": "onset_time",
+      "anchor": "#Q.onset_time",
+      "label": "When did symptoms start? (Last known well)",
+      "critical": true,
+      "phrases": [
+        "when did this start",
+        "what time did you notice",
+        "when were you last normal",
+        "last known well",
+        "when did you first notice"
+      ]
+    },
+    {
+      "id": "focal_symptoms",
+      "anchor": "#Q.focal_symptoms",
+      "label": "Which specific functions are affected?",
+      "critical": true,
+      "phrases": [
+        "which side is weak",
+        "can you move your arm",
+        "can you move your leg",
+        "facial droop",
+        "speech difficulty",
+        "trouble speaking"
+      ]
+    },
+    {
+      "id": "sudden_onset",
+      "anchor": "#Q.sudden_onset",
+      "label": "Was the onset sudden or gradual?",
+      "critical": true,
+      "phrases": [
+        "sudden onset",
+        "came on suddenly",
+        "gradual onset",
+        "how quickly did it start"
+      ]
+    },
+    {
+      "id": "headache",
+      "anchor": "#Q.headache",
+      "label": "Any associated headache?",
+      "critical": false,
+      "phrases": [
+        "do you have a headache",
+        "any head pain",
+        "headache"
+      ]
+    },
+    {
+      "id": "vision_changes",
+      "anchor": "#Q.vision_changes",
+      "label": "Any vision changes?",
+      "critical": false,
+      "phrases": [
+        "vision changes",
+        "trouble seeing",
+        "blurry vision",
+        "double vision"
+      ]
+    },
+    {
+      "id": "prior_stroke",
+      "anchor": "#Q.prior_stroke",
+      "label": "Any history of stroke or TIA?",
+      "critical": true,
+      "phrases": [
+        "prior stroke",
+        "history of stroke",
+        "had a stroke before",
+        "TIA",
+        "mini stroke"
+      ]
+    },
+    {
+      "id": "medications",
+      "anchor": "#Q.medications",
+      "label": "Current medications (especially anticoagulants)?",
+      "critical": true,
+      "phrases": [
+        "what medications",
+        "taking any medications",
+        "blood thinners",
+        "anticoagulants",
+        "warfarin",
+        "aspirin"
+      ]
+    }
+  ],
+  "key_questions_policy": {
+    "anchor": "#R.key_questions",
+    "critical_weight": 2.0,
+    "noncritical_weight": 1.0,
+    "coverage_threshold": 0.7
+  },
+  "reasoning": {
+    "anchor": "#R.reasoning",
+    "required_links": [
+      {
+        "id": "acute_to_stroke",
+        "anchor": "#R.reason.acute_to_stroke",
+        "description": "Acute focal deficit → consider stroke",
+        "pattern": "(acute|sudden).*(focal|weakness|deficit).*(stroke|CVA)|(stroke|CVA).*(acute|sudden).*(focal|weakness|deficit)"
+      },
+      {
+        "id": "onset_to_ct",
+        "anchor": "#R.reason.onset_to_ct",
+        "description": "Time of onset → need for urgent CT",
+        "pattern": "(time|onset|when).*(CT|imaging|scan)|(CT|imaging|scan).*(urgent|immediate|stat|emergency)"
+      },
+      {
+        "id": "anticoagulation_risk",
+        "anchor": "#R.reason.anticoagulation_risk",
+        "description": "Anticoagulation status → bleeding risk",
+        "pattern": "(anticoagulant|blood thinner|warfarin).*(bleed|hemorrhage|risk)|(bleed|hemorrhage).*(anticoagulant|blood thinner)"
+      }
+    ],
+    "major_gap_penalty": -0.5
+  },
+  "summary": {
+    "anchor": "#R.summary",
+    "max_tokens": 80,
+    "overflow_divisor": 20,
+    "required_elements": [
+      {
+        "id": "problem",
+        "anchor": "#R.summary.req.problem",
+        "description": "Chief complaint or problem statement",
+        "pattern": "(\\d+.year.old|\\d+.y/o).*(male|female|patient|man|woman)"
+      },
+      {
+        "id": "pos2",
+        "anchor": "#R.summary.req.pos2",
+        "description": "At least 2 positive findings",
+        "pattern": null
+      },
+      {
+        "id": "neg1",
+        "anchor": "#R.summary.req.neg1",
+        "description": "At least 1 negative finding",
+        "pattern": "(no|denies|negative for)"
+      },
+      {
+        "id": "leading_dx",
+        "anchor": "#R.summary.req.leading_dx",
+        "description": "Leading diagnosis",
+        "pattern": "(concern|worried|suspect|likely|diagnosis|differential).*(stroke|CVA|ischemic|hemorrhagic)"
+      }
+    ]
+  },
+  "communication": {
+    "anchor": "#R.communication",
+    "weight": 0.0,
+    "rules": []
+  }
+}
+

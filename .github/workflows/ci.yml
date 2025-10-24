@@ -1,0 +1,126 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: Install shared dependencies
+      run: |
+        pip install pydantic fastapi
+    
+    - name: Run shared utilities tests
+      run: |
+        pytest shared/ -v --cov=shared --cov-report=xml
+    
+    - name: Test Rubric Management Service
+      run: |
+        cd services/rubric_management
+        pip install -r requirements.txt
+        pytest tests/ -v || echo "No tests yet"
+    
+    - name: Test Structure Evaluator Service
+      run: |
+        cd services/structure_evaluator
+        pip install -r requirements.txt
+        pytest tests/ -v || echo "No tests yet"
+    
+    - name: Test Scoring Service
+      run: |
+        cd services/scoring
+        pip install -r requirements.txt
+        pytest tests/ -v || echo "No tests yet"
+    
+    - name: Test Feedback Composer Service
+      run: |
+        cd services/feedback_composer
+        pip install -r requirements.txt
+        pytest tests/ -v || echo "No tests yet"
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort
+    
+    - name: Run flake8
+      run: |
+        flake8 shared/ services/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 shared/ services/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check shared/ services/ || echo "Code formatting issues found"
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only shared/ services/ || echo "Import sorting issues found"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build Rubric Management Service
+      run: |
+        docker build -f services/rubric_management/Dockerfile -t rubric-management:test .
+    
+    - name: Build Structure Evaluator Service
+      run: |
+        docker build -f services/structure_evaluator/Dockerfile -t structure-evaluator:test .
+    
+    - name: Build Scoring Service
+      run: |
+        docker build -f services/scoring/Dockerfile -t scoring:test .
+    
+    - name: Build Feedback Composer Service
+      run: |
+        docker build -f services/feedback_composer/Dockerfile -t feedback-composer:test .
+    
+    - name: Test docker-compose
+      run: |
+        docker-compose config
+

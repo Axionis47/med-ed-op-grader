@@ -1,0 +1,202 @@
+{
+  "rubric_id": "chest_pain_v1",
+  "version": "1.0.0",
+  "status": "approved",
+  "created_at": "2025-10-24T10:00:00Z",
+  "updated_at": "2025-10-24T10:00:00Z",
+  "weights": {
+    "structure": 0.15,
+    "key_questions": 0.45,
+    "reasoning": 0.25,
+    "summary": 0.15,
+    "communication": 0.0
+  },
+  "structure": {
+    "anchor": "#R.structure",
+    "expected_order": ["CC", "HPI", "ROS", "PMH", "SH", "FH", "Summary"],
+    "penalties": [
+      {
+        "id": "missing_summary",
+        "anchor": "#R.structure.penalty.missing_summary",
+        "description": "Missing summary section",
+        "value": -0.3
+      },
+      {
+        "id": "missing_hpi",
+        "anchor": "#R.structure.penalty.missing_hpi",
+        "description": "Missing HPI section",
+        "value": -0.4
+      }
+    ]
+  },
+  "key_questions": [
+    {
+      "id": "pain_quality",
+      "anchor": "#Q.pain_quality",
+      "label": "What does the pain feel like?",
+      "critical": true,
+      "phrases": [
+        "what does the pain feel like",
+        "describe the pain",
+        "quality of pain",
+        "sharp or dull",
+        "pressure or squeezing"
+      ]
+    },
+    {
+      "id": "pain_location",
+      "anchor": "#Q.pain_location",
+      "label": "Where exactly is the pain?",
+      "critical": true,
+      "phrases": [
+        "where is the pain",
+        "location of pain",
+        "point to where it hurts",
+        "show me where"
+      ]
+    },
+    {
+      "id": "radiation",
+      "anchor": "#Q.radiation",
+      "label": "Does the pain radiate anywhere?",
+      "critical": true,
+      "phrases": [
+        "does it radiate",
+        "does it spread",
+        "pain go anywhere else",
+        "travel to your arm",
+        "travel to your jaw"
+      ]
+    },
+    {
+      "id": "onset_timing",
+      "anchor": "#Q.onset_timing",
+      "label": "When did the pain start?",
+      "critical": true,
+      "phrases": [
+        "when did it start",
+        "how long ago",
+        "when did you first notice"
+      ]
+    },
+    {
+      "id": "exertion_relation",
+      "anchor": "#Q.exertion_relation",
+      "label": "Related to exertion or rest?",
+      "critical": true,
+      "phrases": [
+        "related to exertion",
+        "worse with activity",
+        "better with rest",
+        "happens when you walk"
+      ]
+    },
+    {
+      "id": "associated_symptoms",
+      "anchor": "#Q.associated_symptoms",
+      "label": "Any shortness of breath, nausea, sweating?",
+      "critical": true,
+      "phrases": [
+        "shortness of breath",
+        "trouble breathing",
+        "nausea",
+        "sweating",
+        "diaphoresis"
+      ]
+    },
+    {
+      "id": "cardiac_risk_factors",
+      "anchor": "#Q.cardiac_risk_factors",
+      "label": "Cardiac risk factors (diabetes, hypertension, smoking)?",
+      "critical": true,
+      "phrases": [
+        "do you have diabetes",
+        "high blood pressure",
+        "hypertension",
+        "do you smoke",
+        "high cholesterol"
+      ]
+    },
+    {
+      "id": "prior_cardiac_history",
+      "anchor": "#Q.prior_cardiac_history",
+      "label": "Any history of heart problems?",
+      "critical": true,
+      "phrases": [
+        "heart problems",
+        "heart attack",
+        "MI",
+        "cardiac history",
+        "stents",
+        "bypass surgery"
+      ]
+    }
+  ],
+  "key_questions_policy": {
+    "anchor": "#R.key_questions",
+    "critical_weight": 2.0,
+    "noncritical_weight": 1.0,
+    "coverage_threshold": 0.75
+  },
+  "reasoning": {
+    "anchor": "#R.reasoning",
+    "required_links": [
+      {
+        "id": "chest_pain_to_acs",
+        "anchor": "#R.reason.chest_pain_to_acs",
+        "description": "Chest pain characteristics → consider ACS",
+        "pattern": "(chest pain|pressure|squeezing).*(ACS|acute coronary|MI|heart attack|cardiac)"
+      },
+      {
+        "id": "risk_factors_to_cardiac",
+        "anchor": "#R.reason.risk_factors_to_cardiac",
+        "description": "Risk factors → increased cardiac concern",
+        "pattern": "(risk factor|diabetes|hypertension|smoking).*(cardiac|heart|coronary)"
+      },
+      {
+        "id": "ekg_troponin_needed",
+        "anchor": "#R.reason.ekg_troponin_needed",
+        "description": "Suspected ACS → need EKG and troponin",
+        "pattern": "(EKG|ECG|troponin).*(urgent|immediate|stat|rule out)"
+      }
+    ],
+    "major_gap_penalty": -0.5
+  },
+  "summary": {
+    "anchor": "#R.summary",
+    "max_tokens": 90,
+    "overflow_divisor": 20,
+    "required_elements": [
+      {
+        "id": "problem",
+        "anchor": "#R.summary.req.problem",
+        "description": "Chief complaint or problem statement",
+        "pattern": "(\\d+.year.old|\\d+.y/o).*(male|female|patient|man|woman)"
+      },
+      {
+        "id": "pain_description",
+        "anchor": "#R.summary.req.pain_description",
+        "description": "Description of chest pain",
+        "pattern": "(chest pain|chest pressure|chest discomfort)"
+      },
+      {
+        "id": "risk_factors",
+        "anchor": "#R.summary.req.risk_factors",
+        "description": "Mention of cardiac risk factors",
+        "pattern": "(diabetes|hypertension|smoking|hyperlipidemia|family history)"
+      },
+      {
+        "id": "leading_dx",
+        "anchor": "#R.summary.req.leading_dx",
+        "description": "Leading diagnosis",
+        "pattern": "(concern|worried|suspect|likely|diagnosis|differential).*(ACS|acute coronary|MI|angina|cardiac)"
+      }
+    ]
+  },
+  "communication": {
+    "anchor": "#R.communication",
+    "weight": 0.0,
+    "rules": []
+  }
+}
+

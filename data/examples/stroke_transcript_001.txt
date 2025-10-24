@@ -1,0 +1,39 @@
+[00:05] Student: Good morning, I'm Dr. Smith. Tell me what brings you in today?
+[00:08] Patient: I have sudden weakness on my left side.
+[00:12] Student: I'm sorry to hear that. When did you first notice the weakness?
+[00:15] Patient: About 2 hours ago, around 8 AM this morning.
+[00:20] Student: Can you describe the weakness for me? Which parts of your body are affected?
+[00:25] Patient: My left arm and left leg feel very weak. I can barely lift my arm.
+[00:30] Student: Did this come on suddenly or gradually?
+[00:33] Patient: It was very sudden. I was eating breakfast and suddenly couldn't hold my fork.
+[00:40] Student: Have you had any other symptoms? Any headache, vision changes, or difficulty speaking?
+[00:45] Patient: No headache, but I did feel a bit dizzy when it started.
+[00:50] Student: Any chest pain or shortness of breath?
+[00:53] Patient: No, nothing like that.
+[00:58] Student: Do you have any past medical history? Any chronic conditions?
+[01:02] Patient: Yes, I have high blood pressure and diabetes.
+[01:07] Student: Are you taking medications for those?
+[01:10] Patient: Yes, I take lisinopril for blood pressure and metformin for diabetes.
+[01:15] Student: Do you smoke or drink alcohol?
+[01:18] Patient: I used to smoke but quit 5 years ago. I have a glass of wine occasionally.
+[01:25] Student: Does anyone in your family have a history of stroke or heart disease?
+[01:30] Patient: My father had a stroke when he was 70.
+[01:35] Student: So to summarize, this is a 65-year-old male with a history of hypertension and diabetes presenting with sudden onset left-sided weakness that started 2 hours ago. He also experienced some dizziness. He has a family history of stroke. Given the sudden onset and risk factors, this is highly concerning for an acute ischemic stroke and requires immediate evaluation and imaging.
+[00:20] Student: Can you describe the weakness for me? Which parts of your body are affected?
+[00:25] Patient: My left arm and left leg feel very weak. I can barely lift my arm.
+[00:30] Student: Did this come on suddenly or gradually?
+[00:33] Patient: It was very sudden. I was eating breakfast and suddenly couldn't hold my fork.
+[00:40] Student: Have you had any other symptoms? Any headache, vision changes, or difficulty speaking?
+[00:45] Patient: No headache, but I did feel a bit dizzy when it started.
+[00:50] Student: Any chest pain or shortness of breath?
+[00:53] Patient: No, nothing like that.
+[00:58] Student: Do you have any past medical history? Any chronic conditions?
+[01:02] Patient: Yes, I have high blood pressure and diabetes.
+[01:07] Student: Are you taking medications for those?
+[01:10] Patient: Yes, I take lisinopril and metformin.
+[01:15] Student: Do you smoke or drink alcohol?
+[01:18] Patient: I used to smoke but quit 5 years ago. I have a glass of wine occasionally.
+[01:25] Student: Does anyone in your family have a history of stroke or heart disease?
+[01:30] Patient: My father had a stroke when he was 70.
+[01:35] Student: So to summarize, this is a 65-year-old male with a history of hypertension and diabetes presenting with sudden onset left-sided weakness that started 2 hours ago. He also experienced some dizziness. He has a family history of stroke. Given the sudden onset and risk factors, this is concerning for an acute ischemic stroke and requires immediate evaluation and imaging.
+

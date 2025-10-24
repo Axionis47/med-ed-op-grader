@@ -1,0 +1,2 @@
+"""Rubric Management Service."""
+
