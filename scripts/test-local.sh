@@ -42,7 +42,7 @@ print_header "Checking Service Health"
 
 # Backend services
 BACKEND_SERVICES=(
-    "grading-orchestrator:8000"
+    "grading-orchestrator:8080"
     "rubric-management:8001"
     "transcript-processing:8002"
     "question-matching:8003"
@@ -81,7 +81,7 @@ echo ""
 echo "Access the portals:"
 echo "  Instructor Portal: http://localhost:3000"
 echo "  Student Portal: http://localhost:3001"
-echo "  API Gateway: http://localhost:8000"
+echo "  API Gateway: http://localhost:8080"
 echo ""
 echo "View logs:"
 echo "  docker compose logs -f [service-name]"
